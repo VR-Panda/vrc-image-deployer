@@ -1,27 +1,16 @@
-# GitHub Action for deploying only the Web folder to GitHub Pages
-name: Publish Web Folder
-
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
 on:
-  # Runs on pushes targeting the default branch with changes in the Web folder
   push:
-    branches: ["main"]
-    paths:
-      - "Web/**"
-
-  # Allows manual trigger
+    branches: [$default-branch]
   workflow_dispatch:
-
-# Set permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
-
-# Allow only one concurrent deployment
 concurrency:
   group: "pages"
-  cancel-in-progress: true
-
+  cancel-in-progress: false
 jobs:
   deploy:
     environment:
@@ -29,25 +18,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Web folder only
-        uses: actions/checkout@v3
-        with:
-          sparse-checkout: |
-            Web
-          sparse-checkout-cone-mode: false
-
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v3
-
-      - name: Disable Jekyll (prevent GitHub Pages processing issues)
-        run: touch Web/.nojekyll
-
-      - name: Upload artifact (Web folder only)
-        uses: actions/upload-pages-artifact@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: './Web'
-          clean: true  # Ensures only Web folder gets published
-
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
